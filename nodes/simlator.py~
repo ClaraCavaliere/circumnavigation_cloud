@@ -1,0 +1,40 @@
+#!/usr/bin/python
+
+import rospy as rp
+import geomtwo.msg as gms
+import threading as thd
+import numpy as np
+
+LOCK = thd.Lock()
+#Initial position
+position = np.array(rp.getparam('initial position'))
+#Velocity
+velocity = None
+
+XMIN = rp.get_param('xmin')
+XMAX = rp.get_param('xmax')
+YMIN = rp.get_param('ymin')
+YMAX = rp.get_param('ymax')
+
+rp.init_node('integrator')
+
+FREQUENCY = 10e1
+RATE = rp.Rate(FREQUENCY)
+TIME_STEP = 1.0/FREQUENCY
+
+#Publisher
+pub = rp.Publisher('position', gms.Point, queue_size=10)
+
+def cmdvel_callback(msg):
+    global velocity
+    LOCK.acquire()
+    velocity = np.array([msg.x, msg.y])
+    LOCK.release()
+rp.Subscriber(
+    name = 'cmdvel'   
+
+
+
+ 
+
+

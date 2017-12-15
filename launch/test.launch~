@@ -1,0 +1,100 @@
+<launch>
+
+ <arg name='agent_names' value='agent1 agent2 agent3'/>
+ <param name= 'agent_names' value='$(arg agent_names)'/>
+
+ <rosparam command='load' file='$(find multi_agent1)/param/target.yaml'/>
+
+
+   <group ns = 'agent1'>
+      
+      <rosparam param = 'initial_position'>
+        [1.0, 2.0] 
+      </rosparam> 
+       
+      <rosparam command='load' file='$(find multi_agent1)/param/target.yaml'/>
+      <rosparam command='load' file='$(find multi_agent1)/param/controller.yaml'/>
+      <rosparam command='load' file='$(find multi_agent1)/param/simulator.yaml'/>
+      
+
+      <remap from='neighbor_bearing_measurement' to='/agent2/bearing_measurement'/>
+      
+      <node name='simulator'
+        pkg='multi_agent1'
+        type='simulator.py'/>
+
+      <node name='controller'
+        pkg='multi_agent1'
+        type='controller.py'/>
+
+      <node name='sensor_simulator'
+        pkg='multi_agent1'
+        type='sensor_simulator.py'/>
+   
+   </group>
+
+
+   <group ns = 'agent2'>
+      
+       <rosparam param = 'initial_position'>
+         [1.0, 2.0] 
+       </rosparam> 
+       
+       <rosparam command='load' file='$(find multi_agent1)/param/target.yaml'/>
+       <rosparam command='load' file='$(find multi_agent1)/param/controller.yaml'/>
+       <rosparam command='load' file='$(find multi_agent1)/param/simulator.yaml'/>
+
+       <remap from='neighbor_bearing_measurement' to='/agent3/bearing_measurement'/>
+      
+       <node name='simulator'
+         pkg='multi_agent1'
+         type='simulator.py'/>
+
+       <node name='controller'
+        pkg='multi_agent1'
+        type='controller.py'/>
+
+       <node name='sensor_simulator'
+        pkg='multi_agent1'
+        type='sensor_simulator.py'/>
+   
+   </group>
+
+
+   <group ns = 'agent3'>
+      
+       <rosparam param = 'initial_position'>
+         [1.0, 2.0] 
+       </rosparam> 
+       
+       <rosparam command='load' file='$(find multi_agent1)/param/target.yaml'/>
+       <rosparam command='load' file='$(find multi_agent1)/param/controller.yaml'/>
+       <rosparam command='load' file='$(find multi_agent1)/param/simulator.yaml'/>
+  
+
+       <remap from='neighbor_bearing_measurement' to='/agent1/bearing_measurement'/>
+      
+       <node name='simulator'
+        pkg='multi_agent1'
+        type='simulator.py'/>
+
+       <node name='controller'
+        pkg='multi_agent1'
+        type='controller.py'/>
+
+      <node name='sensor_simulator'
+       pkg='multi_agent1'
+       type='sensor_simulator.py'/>
+   
+   </group>
+
+
+   <rosparam command='load' file='$(find multi_agent1)/param/plotter.yaml'/>
+
+   <node name='plotter'
+     pkg='multi_agent1'
+     type='plotter.py'/>
+
+   
+ 
+</launch>
