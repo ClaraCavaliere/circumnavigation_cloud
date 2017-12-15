@@ -8,7 +8,7 @@ import threading as thd
 import numpy as np
 import math
 from std_msgs.msg import Float32
-import cloud1.srv as srvc
+import circumnavigation_cloud.srv as srvc
 import geometry_msgs.msg as gm
 
 
