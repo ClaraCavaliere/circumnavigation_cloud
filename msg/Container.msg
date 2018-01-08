@@ -1,4 +1,3 @@
-int64 sens_ID
-float64 x
-float64 y                                                      
-
+float32 beta
+geomtwo/Vector bear_msrm_neigh
+float32 control_signal_neigh

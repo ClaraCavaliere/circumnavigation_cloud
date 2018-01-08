@@ -1,0 +1,2 @@
+set(cirumnavigation_cloud_MESSAGE_FILES "")
+set(cirumnavigation_cloud_SERVICE_FILES "/home/smladmin/catkin_ws/src/circumnavigation_cloud/srv/SensorService.srv;/home/smladmin/catkin_ws/src/circumnavigation_cloud/srv/CloudService.srv")

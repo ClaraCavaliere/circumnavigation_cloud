@@ -5,13 +5,12 @@ import geomtwo.msg as gms
 import geomtwo.impl as gmi
 import threading as thd
 import numpy as np
-import cloud1.srv as srvc
-
+import circumnavigation_cloud.srv as srvc
 
 TARGET_POSITION = np.array(rp.get_param('target_position')) #from the .yaml file
-agent_name = rp.get_param('agentID')
 bearing = None
 position = None
+agent_name = rp.get_param('agentID')
 
 #Lock
 LOCK = thd.Lock()
@@ -32,11 +31,6 @@ rp.Subscriber(
     queue_size=10)
 
 
-#Publisher
-pub = rp.Publisher(
-    name='bearing_measurement',
-    data_class=gms.Vector,
-    queue_size=10)
 
 
 rp.wait_for_message('position', gms.Vector)
@@ -47,10 +41,8 @@ def sensor_srvc_handler(req):
     LOCK.acquire()
     #Bearing vector (phi)
     bearing = (TARGET_POSITION-position)/np.linalg.norm(TARGET_POSITION-position)
-    msg = gms.Vector(*bearing)
-    pub.publish(msg)
     LOCK.release()
-    return srvc.SensorServiceResponse(str(agent_name), gmi.Vector(bearing[0], bearing[1]))
+    return srvc.SensorServiceResponse(gmi.Vector(bearing[0], bearing[1]))
 
 rp.Service('Sensor_Service', srvc.SensorService, sensor_srvc_handler)
 

@@ -1,6 +1,7 @@
 <launch>
 
-   <arg name='agent_names' value='agent1 agent2 agent3'/>
+   <arg name='agent_names' value='agent1 agent2 agent3 '/> -->
+   <!-- <arg name='agent_names' value='agent1 agent2 agent3'/> -->
    <param name='agent_names' value='$(arg agent_names)'/>
 
    <rosparam command='load' file='$(find circumnavigation_cloud)/param/target.yaml'/>
@@ -11,11 +12,10 @@
       <param name='deltaT' type='double' value='2.0'/>
 
       <param name='agentID' type='int' value='0'/>
-      <param name='neighID' type='int' value='1'/>
 
       <param name='delay' type='double' value='0.0'/>
       
-      <rosparam param = 'initial_position'>[0.0, 1.0]</rosparam> 
+      <rosparam param = 'initial_position'>[1.0, 0.0]</rosparam> 
        
       <rosparam command='load' file='$(find circumnavigation_cloud)/param/target.yaml'/>
       <rosparam command='load' file='$(find circumnavigation_cloud)/param/controller.yaml'/>
@@ -41,7 +41,6 @@
        <param name='deltaT' type='double' value='2.0'/>
 
        <param name='agentID' type='int' value='1'/>
-       <param name='neighID' type='int' value='2'/>
 
        <param name='delay' type='double' value='1.0'/>
       
@@ -70,13 +69,11 @@
 
        <param name='deltaT' type='double' value='2.0'/>
 
-       <param name='neighID' type='int' value='0'/>
-
        <param name='agentID' type='int' value='2'/>
 
        <param name='delay' type='double' value='2.0'/>
       
-       <rosparam param = 'initial_position'>[0.0, 1.0]</rosparam> 
+       <rosparam param = 'initial_position'>[0.5, 0.5]</rosparam> 
        
        <rosparam command='load' file='$(find circumnavigation_cloud)/param/target.yaml'/>
        <rosparam command='load' file='$(find circumnavigation_cloud)/param/controller.yaml'/>
@@ -98,6 +95,68 @@
    
    </group>
 
+<!--    <group ns = 'agent4'>
+
+       <param name='deltaT' type='double' value='2.0'/>
+
+       <param name='agentID' type='int' value='3'/>
+
+       <param name='delay' type='double' value='2.0'/>
+      
+       <rosparam param = 'initial_position'>[1.0, 0.0]</rosparam> 
+       
+       <rosparam command='load' file='$(find circumnavigation_cloud)/param/target.yaml'/>
+       <rosparam command='load' file='$(find circumnavigation_cloud)/param/controller.yaml'/>
+       <rosparam command='load' file='$(find circumnavigation_cloud)/param/simulator.yaml'/>
+  
+
+      
+       <node name='simulator'
+        pkg='circumnavigation_cloud'
+        type='simulator.py' output="screen"/>
+
+       <node name='controller'
+        pkg='circumnavigation_cloud'
+        type='controller.py' output="screen"/>
+
+       <node name='sensor_simulator'
+        pkg='circumnavigation_cloud'
+        type='sensor_simulator.py' output="screen"/>
+   
+   </group>
+
+
+
+   <group ns = 'agent5'>
+
+       <param name='deltaT' type='double' value='2.0'/>
+
+       <param name='agentID' type='int' value='4'/>
+
+       <param name='delay' type='double' value='2.0'/>
+      
+       <rosparam param = 'initial_position'>[-1.0, 1.0]</rosparam> 
+       
+       <rosparam command='load' file='$(find circumnavigation_cloud)/param/target.yaml'/>
+       <rosparam command='load' file='$(find circumnavigation_cloud)/param/controller.yaml'/>
+       <rosparam command='load' file='$(find circumnavigation_cloud)/param/simulator.yaml'/>
+  
+
+      
+       <node name='simulator'
+        pkg='circumnavigation_cloud'
+        type='simulator.py' output="screen"/>
+
+       <node name='controller'
+        pkg='circumnavigation_cloud'
+        type='controller.py' output="screen"/>
+
+       <node name='sensor_simulator'
+        pkg='circumnavigation_cloud'
+        type='sensor_simulator.py' output="screen"/>
+   
+   </group> -->
+
    <node name='cloud_agent_info'
      pkg='circumnavigation_cloud'
      type='cloud_agent_info.py' output="screen"/>
@@ -108,9 +167,5 @@
    <node name='plotter'
      pkg='circumnavigation_cloud'
      type='plotter.py' output="screen"/>
-
-   
-
-   
  
 </launch>

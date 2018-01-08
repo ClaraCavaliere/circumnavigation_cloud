@@ -21,7 +21,7 @@ distance = None
 TARGET_POSITION = rp.get_param('target_position')
 DESIRED_DISTANCE = rp.get_param('desired_distance')
 agent_name = rp.get_param('agentID')
-neigh_name = rp.get_param('neighID')
+angle = 0.0
 
 
 
@@ -39,12 +39,10 @@ def Counterclockwise_angle(bearing_measurement,neighbor_bearing_measurement):
     vp=np.cross(phi_i,phi_j)
     cos_beta=sp/(n_i*n_j)
     sin_beta=vp[2]/(n_i*n_j)
-    beta=math.atan2(sin_beta,cos_beta)
-    if beta<0:
-        beta=beta+2*math.pi
-    return beta
-
-
+    beta_angle=math.atan2(sin_beta,cos_beta)
+    if beta_angle<0:
+        beta_angle=beta_angle+2*math.pi
+    return beta_angle
 
 #Subscribers
 def position_callback(msg):
@@ -62,13 +60,19 @@ rp.Subscriber(
 #Call to the service 'Sensor_Service'
 rp.wait_for_service('Sensor_Service')
 sensor_proxy = rp.ServiceProxy('Sensor_Service', srvc.SensorService)
+resp = sensor_proxy()
+bearing_measurement = resp.bear_msrm
+bear_ref = bearing_measurement
 
+
+tacs = rp.get_time()
+vel = 0.0
 #Call to the service '/Cloud_Service'
 rp.wait_for_service('/Cloud_Service')
 cloud_proxy = rp.ServiceProxy('/Cloud_Service', srvc.CloudService)
-cloud_resp = cloud_proxy(str(neigh_name)) 
-
-
+cloud_resp = cloud_proxy(str(agent_name), bearing_measurement, vel, tacs) 
+beta = cloud_resp.beta
+angle = beta
 
 RATE = rp.Rate(60.0)
 start = False
@@ -88,43 +92,54 @@ beta_pub = rp.Publisher(
     queue_size=10)
 
 
-ti = rp.get_time()
-#five_sec_rate = rp.Rate(0.2)
-while not rp.is_shutdown() and not start:
-    tf = rp.get_time()
-    if (tf-ti)>2:
-      cloud_resp = cloud_proxy(str(neigh_name)) 
-      ti = rp.get_time()
-    resp = sensor_proxy()
-    bearing_measurement = np.array([resp.bear_msrm.x, resp.bear_msrm.y])
-    neigh_bear_meas = np.array([cloud_resp.neigh_bear_vector.x, cloud_resp.neigh_bear_vector.y])
-    LOCK.acquire()
 
-    if all([not data is None for data in [position, bearing_measurement, neigh_bear_meas]]):
-      start = True      
-    LOCK.release()
-    RATE.sleep()
 
            
+# while not rp.is_shutdown():
+#   tf = rp.get_time()
+#   resp = sensor_proxy()
+#   bearing_measurement = resp.bear_msrm
+#   angle = Counterclockwise_angle(np.array([bear_ref.x,bear_ref.y]),([bearing_measurement.x,bearing_measurement.y]))
+#   if (tf-ti)>0.1:
+#     #cloud_resp = cloud_proxy(str(agent_name), bearing_measurement)
+#     cloud_resp = cloud_proxy(str(agent_name), bearing_measurement, vel)
+#     ti = rp.get_time()
+#   estimate_neigh_pos = gmi.Vector(cloud_resp.bear_msrm_neigh).rotate(cloud_resp.control_signal_neigh)
+#   beta = Counterclockwise_angle(np.array([bearing_measurement.x, bearing_measurement.y]), np.array([estimate_neigh_pos.x, estimate_neigh_pos.y]))
+#   #beta = cloud_resp.beta
+
+
+##Event triggered
+# while not rp.is_shutdown():
+#   ti = rp.get_time()
+#   resp = sensor_proxy()
+#   bearing_measurement = resp.bear_msrm
+#   angle = Counterclockwise_angle(np.array([bear_ref.x,bear_ref.y]),([bearing_measurement.x,bearing_measurement.y]))
+#   if angle>=beta:
+#     cloud_resp = cloud_proxy(str(agent_name), bearing_measurement, vel)
+#     bear_ref = bearing_measurement
+#   beta = cloud_resp.beta
+
+tprec = 0.0
+
 while not rp.is_shutdown():
-  tf = rp.get_time()
-  if (tf-ti)>2:
-    cloud_resp = cloud_proxy(str(neigh_name)) 
-    ti = rp.get_time()
+  tcorr = rp.get_time()
   resp = sensor_proxy()
-  bearing_measurement = np.array([resp.bear_msrm.x, resp.bear_msrm.y])
-  neigh_bear_meas = np.array([cloud_resp.neigh_bear_vector.x, cloud_resp.neigh_bear_vector.y])
+  bearing_measurement = gmi.Vector(resp.bear_msrm)
+  angle = Counterclockwise_angle(np.array([bear_ref.x,bear_ref.y]),([bearing_measurement.x,bearing_measurement.y]))
+  if angle>=beta:
+    req = srvc.CloudServiceRequest(str(agent_name), bearing_measurement, vel, tcorr)
+    cloud_resp = cloud_proxy(req)
+    bear_ref = gmi.Vector(bearing_measurement)
+    estimate_neigh_pos = gmi.Vector(cloud_resp.bear_msrm_neigh).rotate(cloud_resp.control_signal_neigh*(tcorr-float(cloud_resp.t_neigh)))
+    beta = Counterclockwise_angle(np.array([bearing_measurement.x, bearing_measurement.y]), np.array([estimate_neigh_pos.x, estimate_neigh_pos.y]))
+  
   LOCK.acquire()
 
-  #Bearing vector in the clockwise direction
-  phi_bar = np.array([bearing_measurement[1], -bearing_measurement[0]])
-
-  #Counterclockwise angle
-  beta = Counterclockwise_angle(bearing_measurement, neigh_bear_meas)
   distance = np.linalg.norm(TARGET_POSITION-position)
 
   #Control law
-  vel = 0.3*distance*(alpha+beta)
+  vel = 0.2*distance*(alpha+beta)
  
   LOCK.release()
 

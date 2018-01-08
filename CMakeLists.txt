@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(cirumnavigation_cloud)
+project(circumnavigation_cloud)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -49,11 +49,12 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-#add_message_files(
-#  FILES
+add_message_files(
+  FILES
+  Container.msg
 #   Message1.msg
 #   Message2.msg
-#)
+)
 
 ## Generate services in the 'srv' folder
 add_service_files(
@@ -106,12 +107,12 @@ generate_messages(
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-#catkin_package(
+catkin_package(
 #  INCLUDE_DIRS include
 #   LIBRARIES cirumnavigation_cloud
-#   CATKIN_DEPENDS geometry_msgs geomtwo message_generation rospy std_msgs
+   CATKIN_DEPENDS geometry_msgs geomtwo message_generation rospy std_msgs
 #  DEPENDS system_lib
-#)
+)
 
 ###########
 ## Build ##

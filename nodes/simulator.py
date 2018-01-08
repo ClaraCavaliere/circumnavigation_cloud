@@ -10,7 +10,7 @@ from std_msgs.msg import Float32
 #Initial position
 position = rp.get_param('initial_position')[0]
 pos = gmi.Versor(position)
-
+agent_name = rp.get_param('agentID')
 LOCK = thd.Lock()
 
 #Velocity
